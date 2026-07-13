@@ -1,0 +1,24 @@
+workflows:
+  ios-workflow:
+    name: iOS Build
+
+    environment:
+      xcode: latest
+
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.bloom.bowelrecord
+
+    scripts:
+      - name: Set up code signing
+        script: |
+          xcode-project use-profiles
+
+      - name: Build ipa
+        script: |
+          xcode-project build-ipa \
+            --project "うんち記録.xcodeproj" \
+            --scheme "うんち記録"
+
+    artifacts:
+      - build/ios/ipa/*.ipa

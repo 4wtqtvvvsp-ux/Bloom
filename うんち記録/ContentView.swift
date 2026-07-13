@@ -8,17 +8,31 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(\.scenePhase) private var scenePhase
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        let appLock = AppLockManager.shared
+        ZStack {
+            MainTabView()
+            if appLock.isLockEnabled && !appLock.isUnlocked {
+                LockScreenView()
+            }
         }
-        .padding()
+        .environment(DataStore.shared)
+        .environment(appLock)
+        .environment(BowelConditionColorSettings.shared)
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background {
+                if AppLockManager.shared.isLockEnabled {
+                    AppAnalytics.log(.app_lock_on_background)
+                }
+                AppLockManager.shared.lockIfEnabled()
+            }
+        }
     }
 }
 
 #Preview {
     ContentView()
+        .environment(BowelConditionColorSettings.shared)
 }
