@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct SettingsView: View {
     @Environment(AppLockManager.self) private var appLock
@@ -54,6 +55,29 @@ struct SettingsView: View {
                     ))
                 }
                 .listRowBackground(AppColors.background)
+
+                Section("その他") {
+                    Button {
+                        openAppStoreReview()
+                    } label: {
+                        HStack(spacing: 12) {
+                            Image(systemName: "star.bubble.fill")
+                                .foregroundStyle(AppColors.accentPink)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("アプリをレビューする")
+                                    .foregroundStyle(AppColors.textPrimary)
+                                Text("App Storeのレビュー投稿画面を開きます")
+                                    .font(.caption)
+                                    .foregroundStyle(AppColors.textSecondary)
+                            }
+                            Spacer(minLength: 8)
+                            Image(systemName: "arrow.up.right")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(AppColors.textSecondary)
+                        }
+                    }
+                }
+                .listRowBackground(AppColors.background)
             }
             .scrollContentBackground(.hidden)
             .background(AppColors.background)
@@ -74,6 +98,12 @@ struct SettingsView: View {
                 Text("ロック画面は表示されなくなります。")
             }
         }
+    }
+
+    /// App Store の「レビューを書く」画面へ（App ID: 6762580003）
+    private func openAppStoreReview() {
+        guard let url = URL(string: "https://apps.apple.com/app/id6762580003?action=write-review") else { return }
+        UIApplication.shared.open(url)
     }
 }
 
