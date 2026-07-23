@@ -19,6 +19,7 @@ struct RecordInputView: View {
     @State private var showImageSourcePicker = false
     @State private var showCamera = false
     @State private var showPhotoLibrary = false
+    @State private var showReviewPrompt = false
     
     var body: some View {
         NavigationStack {
@@ -141,6 +142,26 @@ struct RecordInputView: View {
                     onSelect: { addImage($0) },
                     onCancel: { AppAnalytics.log(.image_picker_cancel, parameters: ["source": "library"]) }
                 )
+            }
+            .confirmationDialog(
+                "ご利用ありがとうございます",
+                isPresented: $showReviewPrompt,
+                titleVisibility: .visible
+            ) {
+                Button("はい") {
+                    ReviewPromptManager.handleLiked()
+                    dismiss()
+                }
+                Button("いまいち") {
+                    ReviewPromptManager.handleDisliked()
+                    dismiss()
+                }
+                Button("まだわからない") {
+                    ReviewPromptManager.handleNotSure()
+                    dismiss()
+                }
+            } message: {
+                Text("Bloomは気に入っていただけましたか？")
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -292,7 +313,12 @@ struct RecordInputView: View {
             imageIds: imageIds
         )
         dataStore.add(record)
-        dismiss()
+        ReviewPromptManager.noteSuccessfulSave()
+        if ReviewPromptManager.shouldShowPrompt() {
+            showReviewPrompt = true
+        } else {
+            dismiss()
+        }
     }
 }
 
